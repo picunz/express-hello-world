@@ -1,0 +1,384 @@
+                  
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+    <title>Tracker ESP 32</title>
+
+    
+  <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+	  
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+      
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/ju/dt-1.11.5/b-2.2.2/sl-1.3.4/datatables.css"/>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/ju/dt-1.11.5/b-2.2.2/sl-1.3.4/datatables.js"></script>
+ 
+ 
+
+    <!-- maps -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa">
+    <style>
+      body
+      {
+        font-family: 'Comfortaa', serif;
+        font-size: 24px;
+        text-shadow: 4px 4px 4px #aaa;
+      }
+      .row > div
+      {
+        margin:10px;
+      }
+      
+
+      /* spinner */
+      .spinner {
+        margin: 100px auto 0;
+        width: 70px;
+        text-align: center;
+      }
+
+      .spinner > div {
+        width: 18px;
+        height: 18px;
+        background-color: #333;
+
+        border-radius: 100%;
+        display: inline-block;
+        -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      }
+
+      .spinner .bounce1 {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
+      }
+
+      .spinner .bounce2 {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
+      }
+
+      @-webkit-keyframes sk-bouncedelay {
+        0%, 80%, 100% { -webkit-transform: scale(0) }
+        40% { -webkit-transform: scale(1.0) }
+      }
+
+      @keyframes sk-bouncedelay {
+        0%, 80%, 100% { 
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        } 40% { 
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+        }
+      }
+
+
+    </style>
+
+  </head>
+
+  <body style="margin:20px"  >
+
+
+
+ 
+    <h1 align="center" class="bg-success title" style="color:#FFF">Tracker-ESP32</h1>
+ 
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link" id="home-tab" data-toggle="tab" href="https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=" role="tab" aria-controls="home" aria-selected="true">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="history-tab" data-toggle="tab" href="https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=pageHistory" role="tab" aria-controls="profile" aria-selected="false">History</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Config</a>
+      </li>
+    </ul>
+
+    <div class = "row">
+      <div class = "column">
+
+        <h1 align="center" class="" style="color:#00A">Friends Networks</h1>
+    
+        <div class="row">
+          <div style="float:left;">
+            <label for="station">Station</label><br/>
+            <input class="form-control" id="station" name="station" type="text" value="" placeholder ="nuova rete" >
+          </div>
+          <div style="float:left;">
+            <label for="pwd">Password</label><br/>
+            <input class="form-control" id="pwd" name="pwd" type="text" value="" placeholder ="password">  
+          </div>
+          <div style="float:left;">
+            <label style="color:#FFF" for="">.</label><br/>
+            <button type="button" id ="sendNewNet" class="btn btn-primary shadow">Add</button>
+          </div>
+        </div>
+
+
+        <div id ="spin" style="position:absolute; width:50%;">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+
+        <div class= "row">
+          <div>
+            <label style="color:#FFF" for="">.</label><br/>
+            <button type="button" id="btShowNetworks" class="btn btn-primary shadow">Show networks</button>
+          </div>
+        </div>
+
+        
+        <div class="row" style="clear:both;font-size:20px;">
+          <table id="data-networks-table" class="table  table-lg table-hover table-bordered" style="width:600px;">  
+          </table>
+        </div>
+        <button type="button" id ="buttonDelete" class="btn btn-danger shadow" style="display:none;">Remove</button>
+
+      </div>
+
+      <div class = "column">
+        <h1 align="center" class="" style="color:#00A">Gps parameters</h1>
+
+        <div class= "row"> 
+          <div>
+            <label for="stop">Stop condition [min]</label><br/>
+            <input class="form-control" id="stop" name="stop" type="text" value="" placeholder ="press refresh" >
+          </div>
+        </div>
+        <br />
+        <div class= "row"> 
+          <div>
+            <label for="step">Step interval [sec]</label><br/>
+            <input class="form-control" id="step" name="step" type="text" value="" placeholder ="press refresh">  
+          </div>
+        </div>  
+        <br />
+        <button type="button" id ="buttonRefreshGps" class="btn btn-warning shadow">Refresh</button>
+        <button type="button" id ="buttonUpdateGps" class="btn btn-warning shadow">Update</button>
+      </div>
+
+    </div>
+
+    
+     
+  <script>
+
+
+/*
+  // links section
+  var _urlExec = "https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec";
+
+  $("#home-tab").click(function(){
+    window.location.href = _urlExec + "?page=";
+  }); 
+  $("#history-tab").click(function(){
+    window.location.href = _urlExec + "?page=pageHistory";
+  });  
+  $("#config-tab").click(function(){
+    window.location.href = _urlExec + "?page=config";
+  });      
+*/
+
+  $(document).ready(function (){
+
+    
+    $("#config-tab").attr('href',window.location.href + "?page=config");
+    $("#home-tab").attr('href',window.location.href + "?page=");
+    
+    function startSpin()
+    {
+      if (!$("#spin").hasClass('spinner'))
+      {
+        $("#spin").addClass('spinner');
+      }
+    }
+
+    function stopSpin()
+    {
+      if ($("#spin").hasClass('spinner'))
+      {
+        $("#spin").removeClass('spinner');
+      }
+    }
+
+
+
+
+    var _interval;
+    
+    var table;
+
+    // handler timer for network 
+
+    function waitForDoneTimer() 
+    {
+      console.log("waitForDoneTimer"); 
+      google.script.run.withSuccessHandler(stopProcessAndResult).checkForDoneCommand();
+    }
+ 
+    function stopProcessAndResult(done)
+    {
+      if (done)
+      {
+        clearInterval(_interval);
+        stopSpin();
+        google.script.run.withSuccessHandler(showNetworksGui).getDataNetworks();
+      }
+    }
+
+    // handler timer for gps 
+
+    function waitForDoneGpsTimer() 
+    {
+      console.log("waitForDoneGpsTimer"); 
+      google.script.run.withSuccessHandler(stopProcessAndGpsResult).checkForDoneCommand();
+    }
+ 
+    function stopProcessAndGpsResult(done)
+    {
+      if (done)
+      {
+        clearInterval(_interval);
+        stopSpin();
+        google.script.run.withSuccessHandler(showGpsParameters).getDataGps();
+      }
+    }
+
+
+
+
+    // command show report nets
+
+    $("#btShowNetworks").click(function(){
+      
+      startSpin();
+      
+      if (table != undefined)
+      { 
+        $('#data-networks-table').hide();
+      }
+
+      //google.script.run.setCommandParameters("", "");
+      //google.script.run.setCommandCell("ShowNets"); // invio comando
+      google.script.run.showNetworks();
+
+      _interval = setInterval(waitForDoneTimer, 1000);
+      
+    });
+
+    function showNetworksGui(dataArray)
+    { 
+      console.log(dataArray); 
+      
+      $('#data-networks-table').show();
+        table = $('#data-networks-table').DataTable({
+          order: [],
+          ordering: false,
+          searching: false,
+          paging:false,
+          destroy:true,
+          //retrieve:true,
+          select:'single',
+          info:false,
+          //buttons: ['copy', 'excel', 'pdf'],
+          data: dataArray,
+          columns: [
+            {"title":"SSID"},
+            {"title":"Password"}
+          ]
+        });
+      
+      table.rows().invalidate().draw();
+      
+      stopSpin();
+      
+    }
+
+    $('#data-networks-table').on( 'click', 'tr', function () {
+        $('#buttonDelete').show();
+    });
+
+    function showGpsParameters(dataArray)
+    {
+      $("#stop").val(dataArray[0]);
+      $("#step").val(dataArray[1]);
+    }
+
+    // command add new net
+    
+    $("#sendNewNet").click(function(){
+
+      startSpin();
+
+      $('#data-networks-table').hide();
+      
+      //google.script.run.setCommandParameters($("#station").val(), $("#pwd").val());
+      //google.script.run.setCommandCell("AddNet"); // invio comando
+
+      google.script.run.addNetwork($("#station").val(), $("#pwd").val());
+
+      _interval = setInterval(waitForDoneTimer, 1000);
+      
+    });
+
+
+    // command delete net
+
+    $('#buttonDelete').click(function() {
+      
+      startSpin();
+
+      var indexToDelete = table.row('.selected').index();  //.remove().draw( false );
+
+      //google.script.run.setCommandParameters(indexToDelete);
+      //google.script.run.setCommandCell("RemoveNet"); // invio comando
+
+      google.script.run.deleteNetwork(indexToDelete);
+
+      _interval = setInterval(waitForDoneTimer, 1000);
+    });
+
+    // command refresh gps parameters
+    
+    $('#buttonRefreshGps').click(function() {
+      
+      startSpin();
+
+      //google.script.run.setCommandParameters("", "");
+      //google.script.run.setCommandCell("RefreshGps"); // invio comando
+
+      google.script.run.showParameters();
+
+      _interval = setInterval(waitForDoneGpsTimer, 1000);
+       
+    });
+
+    $('#buttonUpdateGps').click(function() {
+      
+      startSpin();
+
+      //google.script.run.setCommandParameters($("#stop").val(), $("#step").val());
+      //google.script.run.setCommandCell("UpdateGps"); // invio comando
+
+      google.script.run.setParameters($("#stop").val(), $("#step").val());
+
+      _interval = setInterval(waitForDoneGpsTimer, 1000);
+       
+    });
+  });
+
+  </script>
+
+    
+  </body>
+</html>
+            

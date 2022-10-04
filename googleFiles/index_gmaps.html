@@ -1,0 +1,564 @@
+                  
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+    <title>Tracker ESP 32</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	  <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+	  <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
+
+
+	  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+	  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap4.min.css">
+
+    <!-- per drop down -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+    <!-- maps -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa">
+    <style>
+      body
+      {
+        font-family: 'Comfortaa', serif;
+        font-size: 24px;
+        text-shadow: 4px 4px 4px #aaa;
+      }
+    </style>
+
+  </head>
+
+  <body style="margin:20px" id="markers-on-the-map">
+
+
+    
+    <h1 align="center" class="bg-success title" style="color:#FFF">Tracker-ESP32</h1>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=" role="tab" aria-controls="home" aria-selected="true">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="history-tab" data-toggle="tab" href="https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=pageHistory" role="tab" aria-controls="history" aria-selected="false">History</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="config-tab" data-toggle="tab" href="https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=config" role="tab" aria-controls="config" aria-selected="false">Config</a>
+      </li>
+    </ul>
+
+    <br />
+ 
+
+    <div class="input-group">
+      <select class="custom-select" id="inputGroupSelect02" style="font-size:20px;">
+        <option selected>Choose  Path...</option>
+      </select>
+      <div class="input-group-append">
+        <label class="input-group-text" for="inputGroupSelect02">Path</label>
+      </div>
+    </div>
+    
+    <h2 id="output"></h2>
+    <p id="dbg"></p>
+
+    <p id="statusDEV">Status Device:<span></span></p>
+    <p id="statusGPS">Status GPS:<span></span></p>
+
+    <div style="clear:both;">  
+      <div id="floating-panel">
+        <button class = "btn btn-primary shadow" id="toggle-heatmap">Toggle Heatmap</button>
+        <button class = "btn btn-primary shadow" id="start-path">Start path</button>
+        <button class = "btn btn-primary shadow" id="show-allpath">Show All</button>  
+      </div>
+    </div>
+
+    <br />
+
+    <div class = "row">
+      <div class = "column">
+
+        <div style="width: 1200px; height: 600px" id="map"></div>
+
+        <br/>
+
+        <div>
+          <label id = "infoPath" for="path">Elevation</label><br/>
+          <input type="range" id="sliderpath" name="path" min="0" max="1100" value="0" onmousemove="showSlideVal(this.value)" style="width:1000px">
+        </div>
+        
+      </div>
+
+      <div class = "column">
+        <div class="" style="font-size:10px;margin:20px;">
+          <table id="data-table"  class="table table-striped table-sm table-hover table-bordered">
+          </table>
+        </div>
+      </div>
+    </div>
+       
+    <a href='https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec?page=about'>Link</a>
+      
+
+    
+  
+  <script>
+
+/*
+  // links section
+  var _urlExec = "https://script.google.com/macros/s/AKfycbyzJqOfYt63BnGdXtjUj-gVN0aLLe0zDRHhXyxAEsC7/exec";
+
+
+  console.log('dbg:');
+  
+
+  $("#home-tab").click(function(){
+    window.location.href = _urlExec + "?page=";
+  }); 
+  $("#history-tab").click(function(){
+    window.location.href = _urlExec + "?page=pageHistory";
+  });  
+   $("#config-tab").click(function(){
+    window.location.href = _urlExec + "?page=config";
+  });  
+*/
+
+   $(document).ready(function (){
+
+    $("#config-tab").attr('href',window.location.href + "?page=config");
+    $("#history-tab").attr('href',window.location.href + "?page=history");
+   });
+
+  google.script.run.withSuccessHandler(loadStatus).gui_getStatus();  
+
+  function loadStatus(dataArray)
+  {
+      console.log(dataArray);
+      $("#statusDEV span").text(dataArray[0]);
+      $("#statusGPS span").text(dataArray[1]);
+  }
+
+  google.script.run.withSuccessHandler(loadDropDownWithPaths).getAllPath();
+
+  function loadDropDownWithPaths(pathList)
+  {
+    $('#inputGroupSelect02').append($('<option>', {
+          value: "current",
+          text: "current"
+    }))
+
+    console.log(pathList.length);
+    for(var i =0; i<pathList.length; i++ )
+    {
+      $('#inputGroupSelect02').append($('<option>', {
+          value:  pathList[i],
+          text: pathList[i]
+      }));  
+       
+    }
+  }
+
+  $('#inputGroupSelect02').on('change', function(){
+    
+    var selected = $(this).val();
+    if (selected == "current")
+    {
+      let d = new Date();
+      let ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d);
+      let mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
+      let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
+      var day = da +" " + mo +" " + ye;   
+
+      $("#output").text("Day:" + day);
+
+      google.script.run.withSuccessHandler(showData).getData();
+    }
+    else
+    {
+      $("#output").text(selected);
+
+
+      
+      google.script.run.withSuccessHandler(showData).getDataPath();
+    }
+  });
+
+
+
+  google.script.run.withSuccessHandler(showData).getData();
+
+  
+  var _data = [];
+
+  
+  function showData(dataArray)
+  {
+    console.log(dataArray);
+    _data = dataArray;
+
+    console.log(dataArray);
+      
+    $('#data-table').DataTable({
+      data: dataArray,
+      destroy:true,
+      
+      columns: [
+        {"title":"Id"},
+        {"title":"DateTime"},
+        {"title":"Lat"},
+        {"title":"Lon"},
+        {"title":"Elevation"},
+        {"title":"Description"}
+      ]
+    });
+    
+    var lenData = _data.length;
+    console.log('len:' + lenData);
+
+    $("#sliderpath").attr('max', lenData);
+
+    initMap();
+  }
+
+
+  var circles = [];
+
+  var prec = 0;
+  function showSlideVal(a)
+  {
+    var dt = _data[a][1];
+    var lat  = _data[a][2];
+    var lon  = _data[a][3];
+    var elev  = _data[a][4];
+   
+
+    var percEl = (elev/800)*100;
+    var color = valueToColor(percEl, 0, 120);
+
+    //map.clear;
+    if (prec!=0)
+      prec.setMap(null);
+
+    prec = addCircle(lat, lon, 100, color, 0);
+
+    var time = dt.split('T');
+    //var infoStr = "Elevation at " + lat + "," + lon + ": " + elev + "m";
+    var infoStr = "Elevation at " + time[1] + ": " + elev + "m";
+    $("#infoPath").text(infoStr);
+
+      
+   
+
+    //console.log(t.center.lat);
+//    c  = lat;
+/*
+    if (circles.includes(c,0))
+    {
+      var found = circles.find(element => element == c);
+      console.log('already');
+      //found.setMap(null);
+    }
+    else
+    {
+      circles.push(c);
+      console.log(circles.length);
+    }
+*/    
+
+
+  }    
+
+  
+  $("#data-table").on('click', 'tr',function(){
+      var tds = $(this).find('td');
+      var lat  = tds.eq(2).text();
+      var lon  = tds.eq(3).text();
+      var elev  = tds.eq(4).text();
+      //alert(elev); 
+
+
+      //var percEl = ((elev * (maxEl-minEl))+minEl) / maxEl-minEl;
+      var percEl = (elev/800)*100;
+      var color = valueToColor(percEl, 0, 120);
+
+      addCircle(lat, lon, 100, color, 0);
+  });
+
+
+
+
+
+  var precDate;
+   
+
+  var nextPos;
+  var stepPath = 20;
+
+  function drawNextPos()
+  {
+    nextPos = nextPos + stepPath;
+
+    var dt = _data[nextPos][0];
+    var lat  = _data[nextPos][1];
+    var lon  = _data[nextPos][2];
+    var elev  = _data[nextPos][3];
+   
+
+    var percEl = (elev/800)*100;
+    var color = valueToColor(percEl, 0, 120);
+
+    //calculate radius
+    var radius = 50;
+    var elapsed = new Date(dt).getTime() - precDate.getTime();
+
+    var divDbg = document.getElementById('dbg');
+    divDbg.innerHTML = 'elapsed:' + elapsed + ' col:' + color + ' pos: ' + lat + "," + lon ;
+    if (elapsed > 20000)
+    {
+      radius = 100;
+    }
+
+    addCircle(lat, lon, radius, color, 0);
+
+    
+
+    precDate = new Date(dt);
+  }
+
+  var intervalId;
+
+  function startPath(position, button)
+  {
+
+    var div = document.getElementById('output');
+    div.innerHTML = 'waiting...';
+
+    heatmap.setMap(null);
+    map.setZoom(14);  
+
+    // initialize precDate with first date
+    //const positionData = position.split(',');
+    //var dt = positionData[0];
+
+    var dt = _data[0][0];
+    precDate = new Date(dt);
+
+    //intervalId = setInterval(nextPos, 1000);
+    nextPos = 1;
+    intervalId = setInterval(drawNextPos, 1000);
+  }
+
+  function addCircle(lat, lon, radius, color, zoom)
+  {
+    var p = new google.maps.LatLng(lat, lon);
+    return new google.maps.Circle({
+            strokeColor: "#000000",
+            strokeOpacity: 0.2,
+            strokeWeight: 1,
+            fillColor: color, //"#FF0000",
+            fillOpacity: 0.4,
+            map,
+            center: p,
+            radius: radius,
+        });
+  }
+
+
+  function onSuccessGetInfo(day) 
+  {
+      var div = document.getElementById('output');
+      div.innerHTML = 'Day: ' + day;
+  }
+
+  google.script.run.withSuccessHandler(onSuccessGetInfo).getDay();
+ 
+
+  // new google maps
+  let map, heatmap;
+
+  function initMap() 
+  {
+    //google.script.run.withSuccessHandler(showData).getData();
+
+    //console.log('***:' + _data.length);
+    var initLan = _data[0][2];
+    var initLon = _data[0][3];
+     
+    
+
+    map = new google.maps.Map(document.getElementById("map"), 
+    {
+      zoom: 13,
+      center: { lat: initLan, lng: initLon },
+      mapTypeId: "satellite",
+    });
+
+    var points = [];
+    points.push(new google.maps.LatLng(44.433029, 8.847566));
+    points.push(new google.maps.LatLng(44.446091, 8.854285));
+    points.push(new google.maps.LatLng(44.452249, 8.850935));
+    points.push(new google.maps.LatLng(44.466983, 8.861999));
+
+  
+    _data.shift();  // remove header todo:need?
+
+    var x = _data.map(function(val) {
+      //return val.slice(1,3);
+      console.log('map:' + val);
+      return new google.maps.LatLng(val[2], val[3]);
+    });
+     
+
+    console.log(x);
+    heatmap = new google.maps.visualization.HeatmapLayer({
+     
+      data: x,
+      map: map,
+    });
+
+    
+   
+    
+
+    document.getElementById("toggle-heatmap").addEventListener("click", toggleHeatmap);
+    document.getElementById("start-path").addEventListener("click", startPath);
+    //document.getElementById("change-opacity").addEventListener("click", changeOpacity);
+    document.getElementById("show-allpath").addEventListener("click", showAllPath);
+  }
+
+  function toggleHeatmap() 
+  {
+    heatmap.setMap(heatmap.getMap() ? null : map);
+  }
+
+  function changeGradient() 
+  {
+    const gradient = [
+      "rgba(0, 255, 255, 0)",
+      "rgba(0, 255, 255, 1)",
+      "rgba(0, 191, 255, 1)",
+      "rgba(0, 127, 255, 1)",
+      "rgba(0, 63, 255, 1)",
+      "rgba(0, 0, 255, 1)",
+      "rgba(0, 0, 223, 1)",
+      "rgba(0, 0, 191, 1)",
+      "rgba(0, 0, 159, 1)",
+      "rgba(0, 0, 127, 1)",
+      "rgba(63, 0, 91, 1)",
+      "rgba(127, 0, 63, 1)",
+      "rgba(191, 0, 31, 1)",
+      "rgba(255, 0, 0, 1)",
+    ];
+
+    heatmap.set("gradient", heatmap.get("gradient") ? null : gradient);
+  }
+
+
+  const HSLToRGB = (h, s, l) => 
+  {
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [255 * f(0), 255 * f(8), 255 * f(4)];
+  };
+  function transitionOfHueRange(percentage, startHue, endHue) 
+  {
+    percentage = 100 - percentage;
+    var hue = ((percentage * (endHue - startHue)) + startHue) / endHue - startHue;
+
+    var colrgb = HSLToRGB(hue,100,50);
+    var color = 'rgb(' + Math.floor(colrgb[0]) + ',' + Math.floor(colrgb[1]) + ',' + Math.floor(colrgb[2]) + ')';
+
+    return color;
+  }
+
+  function valueToColor(percentage, startHue, endHue) 
+  {
+    percentage = 100 - percentage;
+    var hue = ((percentage * (endHue - startHue)) + startHue) / endHue - startHue;
+
+    var colrgb = HSLToRGB(hue,100,50);
+    var color = 'rgb(' + Math.floor(colrgb[0]) + ',' + Math.floor(colrgb[1]) + ',' + Math.floor(colrgb[2]) + ')';
+
+    return color;
+  }
+
+
+  var maxEl = 800;
+  var minEl = 0;
+
+  function showAllPath() 
+  {
+    //heatmap.set("radius", heatmap.get("radius") ? null : 20);
+
+    heatmap.setMap(null);
+
+    //_data.shift();  // remove header
+    //console.log(_data);
+    var x = _data.map(function(val,i) {
+      //return val.slice(1,3);
+      //console.log(val[1]);
+      var p = new google.maps.LatLng(val[1],val[2]);
+      
+      //console.log(i);
+      if (i%20 ==0)
+      {
+        var percEl = ((val[3] * (maxEl-minEl))+minEl) / maxEl-minEl;
+        var color = valueToColor(percEl, 0, 120);
+       
+        return new google.maps.Circle({
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            //fillColor: "#FF0000",
+            fillColor: color,
+            fillOpacity: 0.35,
+            map,
+            center: p,
+            radius: 100,
+        });
+      }
+      
+
+      //return new google.maps.LatLng(val[1], val[2]);
+    });
+
+  }
+
+  function changeOpacity() 
+  {
+    heatmap.set("opacity", heatmap.get("opacity") ? null : 0.2);
+
+  
+  }
+
+  // Heatmap data: 500 Points
+  function getPoints() 
+  {
+    return [
+      new google.maps.LatLng(44.433029, 8.847566),
+      new google.maps.LatLng(44.446091, 8.854285),
+      new google.maps.LatLng(44.452249, 8.850935),
+      new google.maps.LatLng(44.466983, 8.861999),
+      
+    ];
+  }
+
+  </script>
+    
+  <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDc_Jnn2N8ZegbgVlYFwGK90csw76cfSAA&libraries=visualization&v=weekly" async>
+  </script>
+    
+    
+  </body>
+</html>
+            
