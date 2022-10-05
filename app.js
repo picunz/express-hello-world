@@ -57,7 +57,7 @@ express()
   })
   
   
-  .listen(port, () => console.log(port))
+  .listen(port, () => console.log('port' + port))
   
   console.log(__dirname);
   console.log(path.join(__dirname, 'views'))

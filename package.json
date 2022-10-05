@@ -9,8 +9,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "start": "node app.js",
-    "build": "npm run compile && npm i -g --loglevel=error --force"
+    "start": "node app.js"
   },
   "dependencies": {
     "cli-truncate": "^3.1.0",
