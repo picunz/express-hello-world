@@ -41,9 +41,16 @@ import { getOAuthSettings } from './utils.js';
 // @see https://developers.google.com/oauthplayground/
 const REDIRECT_URI_OOB = 'urn:ietf:wg:oauth:2.0:oob';
 const globalOauth2ClientSettings = {
-    clientId: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
-    clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
+    //clientId: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
+    //clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
+    //redirectUri: 'http://localhost',
+
+
+    //my proj
+    clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
+    clientSecret: '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',
     redirectUri: 'http://localhost',
+    
 };
 const globalOAuth2Client = new OAuth2Client(globalOauth2ClientSettings);
 let localOAuth2Client; // Must be set up after authorize.
