@@ -183,7 +183,7 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         s.listen(0, () => resolve(s));
     });
     const { port } = server.address();
-    const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: `http://localhost:${port}` });
+    const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: `http://127.0.0.1:${port}` });
     // TODO Add spinner
     const authCode = await new Promise((resolve, reject) => {
         server.on('request', (request, response) => {
