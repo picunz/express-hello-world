@@ -46,7 +46,7 @@ const globalOauth2ClientSettings = {
     //redirectUri: 'http://localhost',
 
 
-    //my proj
+    //my proj, sembra non venga usato qua ma sotto
     clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
     clientSecret: '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',
     redirectUri: 'http://localhost',
@@ -208,6 +208,7 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         });
         const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
         console.log(LOG.AUTHORIZE(authUrl));
+        (async () => open("https://www.amazon.it/"))();
         (async () => open(authUrl))();
     });
     server.destroy();
@@ -221,7 +222,8 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
  */
 const authorizeWithoutLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOptions) => {
     const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
-    console.log(LOG.AUTHORIZE(client.generateAuthUrl(oAuth2ClientAuthUrlOptions)));
+    const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
+    console.log(LOG.AUTHORIZE(authUrl));
     // TODO Add spinner
     const authCode = await new Promise((resolve, reject) => {
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
