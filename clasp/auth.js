@@ -49,8 +49,7 @@ const globalOauth2ClientSettings = {
     //my proj, sembra non venga usato qua ma sotto
     clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
     clientSecret: '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',
-    //redirectUri: 'http://localhost',
-    redirectUri: 'https://hello-clasp.herokuapp.com/create'
+    redirectUri: 'http://localhost',
     
 };
 const globalOAuth2Client = new OAuth2Client(globalOauth2ClientSettings);
@@ -102,9 +101,9 @@ export const authorize = async (options) => {
         else {
             // Use global credentials
             const globalOauth2ClientOptions = {
-                clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
-                clientSecret: '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',
-                redirectUri: 'https://hello-clasp.herokuapp.com/create',
+                clientId: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
+                clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
+                redirectUri: 'http://localhost',
             };
             oAuth2ClientOptions = globalOauth2ClientOptions;
         }
