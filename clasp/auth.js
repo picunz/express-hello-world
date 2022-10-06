@@ -50,7 +50,7 @@ const globalOauth2ClientSettings = {
     clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
     clientSecret: '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',
     //redirectUri: 'http://localhost',
-    redirectUri: 'http://hello-clasp.herokuapp.com/create'
+    redirectUri: 'https://hello-clasp.herokuapp.com/create'
     
 };
 const globalOAuth2Client = new OAuth2Client(globalOauth2ClientSettings);
