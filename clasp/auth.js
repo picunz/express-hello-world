@@ -50,7 +50,7 @@ const globalOauth2ClientSettings = {
     clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
     clientSecret: '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',
     //redirectUri: 'http://localhost',
-    redirectUri: 'https://hello-clasp.herokuapp.com/auth/google/callback'
+    redirectUri: 'http://hello-clasp.herokuapp.com/auth/google/callback'
     
 };
 const globalOAuth2Client = new OAuth2Client(globalOauth2ClientSettings);
@@ -104,7 +104,7 @@ export const authorize = async (options) => {
             const globalOauth2ClientOptions = {
                 clientId: '445239268862-o8rvrg61dv8n8ntthrtvnli7e8ok06ek.apps.googleusercontent.com',
                 clientSecret: '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',
-                redirectUri: 'http://hello-clasp.herokuapp.com/auth/google/callback',
+                redirectUri: 'https://hello-clasp.herokuapp.com/auth/google/callback',
             };
             oAuth2ClientOptions = globalOauth2ClientOptions;
         }
