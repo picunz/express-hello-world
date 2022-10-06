@@ -101,9 +101,13 @@ export const authorize = async (options) => {
         else {
             // Use global credentials
             const globalOauth2ClientOptions = {
+                
                 clientId: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
                 clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
-                redirectUri: 'http://localhost',
+                //redirectUri: 'http://localhost',
+                redirectUri: 'https://hello-clasp.herokuapp.com/create',
+
+
             };
             oAuth2ClientOptions = globalOauth2ClientOptions;
         }
