@@ -340,10 +340,14 @@ export const authorize_getUrl = async () => {
       const oAuth2ClientAuthUrlOptions = { access_type: 'offline', scope };
       // Grab a token from the credentials.
 
-      const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
+      //const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
       //const token = await authorizeWithoutLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
-       
-      console.log('token:' + token);
+      //console.log('token:' + token); 
+
+      const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
+      const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
+      return authUrl;
+      
 
       //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
       //const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
