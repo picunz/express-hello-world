@@ -86,11 +86,16 @@ express()
   
       console.log('clicked');
               
-      //scriptId = await googleProvisioning();
+      scriptId = await createGoogleProject("test_From_Node");
 
-      scriptId = await createGoogleProject();
-
+      console.log(scriptId);
       
+      res.render('pages/index', { name: scriptId, tokenState: "OK" });
+  })
+
+  .post('/createPrj', async(req,res) => {
+      var prjName = req.body.ProjectName;
+      scriptId = await createGoogleProject(prjName);
 
       console.log(scriptId);
       

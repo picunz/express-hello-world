@@ -43,7 +43,9 @@
   </head>
   <body>
     
+   <!--
       <a href="/testAuth" class="btn btn-danger">Authorize</a>
+   -->   
       <a href="/testAuthSep" class="btn btn-danger">Authorize Sep</a>
 
       <br />
@@ -64,14 +66,8 @@
          </fieldset>
        </form>
 
-      
-      
-      
-   
      
       <% if (tokenState != "-") { %>
-         
-         
          <%
             var link = "https://script.google.com/home/projects/" + name + "/edit";
          %>
@@ -79,6 +75,16 @@
          <p>Token: <%= tokenState %></p> 
          
          <a href="/create" class="btn btn-primary">Create Project</a> 
+
+         <form action="/createPrj" method="POST">
+            <fieldset>
+              <label>Project name</label>
+              <input type ="text" id="ProjectName" name="ProjectName" required>
+              
+              <button type ="submit" class="btn btn-primary">Submit</button>
+            </fieldset>
+          </form>
+
          <br /> 
          <img id ="waitingImg" style="display:none;" src="waiting2.gif" alt="this slowpoke moves"  width="50" /> 
          <br />

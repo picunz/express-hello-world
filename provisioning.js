@@ -52,14 +52,14 @@ export async function googleProvisioning()
     */
 }
 
-export async function createGoogleProject()
+export async function createGoogleProject(title)
 {
    console.log('*** creating');
    
    const config = Conf.get();
     const { data } = await script.projects.create({
         requestBody: {
-            "title": "from_node2"
+            "title": title
         },
     });
     
