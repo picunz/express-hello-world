@@ -1,9 +1,12 @@
 import fs from 'fs-extra';
-import { googleProvisioning,googleProvisioning2 } from './provisioning.js';
-
+ 
 import {Conf} from './clasp/conf.js';
 import {hasOauthClientSettings, safeIsOnline, saveProject} from './clasp/utils.js';
 import { pushFiles } from './clasp/files.js';
+
+import { authorize_getUrl, defaultScopes } from './clasp/auth.js';
+import { googleProvisioning, createGoogleProject } from './provisioning.js';
+
 
 //const express = require('express');
 import express from 'express';
@@ -18,7 +21,7 @@ const __dirname = path.dirname(__filename);
 
 //const app = express();
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5001
 
 var scriptId;
  
@@ -26,16 +29,34 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('view engine', 'ejs')
   .get('/', (req, res) => { res.render('pages/index', { name: "-" })})
+
+  .get('/testUrl', async (req, res) => {
+      
+   const useLocalhost = false;  
+   //const authUrl = authorize_getUrl({ scopes: defaultScopes, useLocalhost });
+   const authUrl = await authorize_getUrl();
+   console.log('***' + authUrl);
+   res.render('pages/index', { name: authUrl });
+   //res.redirect("http://www.facebook.com")
+   })
+
   .get('/create', async (req, res) => { 
   
       console.log('clicked');
               
-         
-      scriptId = await googleProvisioning();
+      //scriptId = await googleProvisioning();
+
+      scriptId = await createGoogleProject();
+
+      
+
       console.log(scriptId);
       
       res.render('pages/index', { name: scriptId });
   })
+  
+  
+
   .get('/addFiles', async (req, res) => { 
   
       console.log('adding files');

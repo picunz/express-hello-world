@@ -212,6 +212,8 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         });
         const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
         console.log(LOG.AUTHORIZE(authUrl));
+
+         
         (async () => open("https://www.amazon.it/"))();
         (async () => open(authUrl))();
     });
@@ -306,3 +308,68 @@ const setOauthClientCredentials = async (rc) => {
 //   }
 // }
 //# sourceMappingURL=auth.js.map
+
+
+
+
+
+// add ach
+export const authorize_getUrl = async () => {
+   try {
+      // Set OAuth2 Client Options
+      let oAuth2ClientOptions;
+       
+      // Use global credentials
+      const globalOauth2ClientOptions = {
+         
+         clientId: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
+         clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
+         //redirectUri: 'http://localhost',
+         //redirectUri: 'https://hello-clasp.herokuapp.com/create',
+         redirectUri: 'https://hello-clasp.herokuapp.com/testUrl',
+      };
+      oAuth2ClientOptions = globalOauth2ClientOptions;
+       
+      // Set scopes
+      /* let scope = (options.creds?options.scopes: defaultScopes);
+      if (options.creds && scope.length === 0) {
+         scope = defaultScopes;
+      } */
+
+      let scope = defaultScopes;   
+      const oAuth2ClientAuthUrlOptions = { access_type: 'offline', scope };
+      // Grab a token from the credentials.
+
+      const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
+      //const token = await authorizeWithoutLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
+       
+      console.log('token:' + token);
+
+      //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
+      //const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
+       
+      // Save global ClaspCredentials
+      let claspToken;
+      claspToken = {
+         token,
+         oauth2ClientSettings: globalOauth2ClientSettings,
+         isLocalCreds: false,
+      };
+      
+      await DOTFILE.AUTH(claspToken.isLocalCreds).write(claspToken);
+      //console.log(LOG.SAVED_CREDS(Boolean(options.creds)));
+
+      
+      console.log('*** load credential');
+      await loadAPICredentials();
+     
+      return 'ok';
+   }
+   catch (error) 
+   {
+       if (error instanceof ClaspError) {
+           throw error;
+       }
+       throw new ClaspError(`${ERROR.ACCESS_TOKEN}${error}`);
+   }
+};

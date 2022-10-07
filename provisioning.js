@@ -14,13 +14,8 @@ import { Conf } from './clasp/conf.js';
 //import {getDefaultProjectName, getProjectSettings, saveProject, spinner, stopSpinner} from '../utils.js';
 const { readJsonSync } = fs;
 
-export const googleProvisioning2 = async () => {
-     
-   const str = await Promise.resolve('hello');
-   return str; 
-    
-};
-
+ 
+// fa tutto ma andrebbe spezzata
 export async function googleProvisioning()
 {
    console.log('*** authorize');
@@ -56,4 +51,22 @@ export async function googleProvisioning()
     await pushFiles();
     */
 }
- 
+
+export async function createGoogleProject()
+{
+   console.log('*** creating');
+   
+   const config = Conf.get();
+    const { data } = await script.projects.create({
+        requestBody: {
+            "title": "from_node2"
+        },
+    });
+    
+    
+   const scriptId = data.scriptId ?? '';
+   
+   const linkPrj = "https://script.google.com/home/projects/" + scriptId + "/edit";
+   
+   return scriptId;
+}
