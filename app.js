@@ -32,12 +32,14 @@ express()
 
   .get('/testUrl', async (req, res) => {
       
-   const useLocalhost = false;  
-   //const authUrl = authorize_getUrl({ scopes: defaultScopes, useLocalhost });
-   const authUrl = await authorize_getUrl();
-   console.log('***' + authUrl);
-   res.render('pages/index', { name: authUrl });
-   //res.redirect("http://www.facebook.com")
+      const useLocalhost = false;  
+      //const authUrl = authorize_getUrl({ scopes: defaultScopes, useLocalhost });
+      /*
+      const authUrl = await authorize_getUrl();
+      console.log('***' + authUrl);
+      res.render('pages/index', { name: authUrl });
+      */
+      res.redirect("http://www.facebook.com")
    })
 
   .get('/create', async (req, res) => { 
