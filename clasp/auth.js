@@ -194,7 +194,7 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         s.listen(0, () => resolve(s));
     });
 
-    var host = externalHost?"https://hello-clasp.herokuapp.com/":"http://localhost";
+    var host = externalHost?"https://hello-clasp.herokuapp.com/testUrl":"http://localhost";
     console.log("host:" + host);
 
     const { port } = server.address();
