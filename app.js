@@ -38,7 +38,7 @@ express()
   .use(express.static("public"))
 
   .set('view engine', 'ejs')
-  .get('/', (req, res) => { res.render('pages/index', { name: "-" })})
+  .get('/', (req, res) => { res.render('pages/index', { name: "-", tokenState: "-" })})
 
   .get('/testAuth', async (req, res) => {
       
@@ -51,7 +51,7 @@ express()
       const authUrl = await authorize_getUrl(externalHost, res, automatic);
       console.log('***' + authUrl);
       
-      res.render('pages/index', { name: authUrl }); // funziona in locale
+      res.render('pages/index', { name: "-",  tokenState: "OK"}); // funziona in locale
 
       //res.redirect(authUrl);  // test su host
       
@@ -94,7 +94,7 @@ express()
 
       console.log(scriptId);
       
-      res.render('pages/index', { name: scriptId });
+      res.render('pages/index', { name: scriptId, tokenState: "OK" });
   })
   
   .get('/testGetToken', async (req, res) => { 
@@ -117,7 +117,7 @@ express()
       
       var token = convertAuthCodeInToken(authCode, globalOauth2ClientOptions, oAuth2ClientAuthUrlOptions);
       console.log("token:" + token);
-      res.render('pages/index', { name: "token ok" });
+      res.render('pages/index', { name: "-", tokenState: "OK" });
       
    })
 
@@ -153,7 +153,7 @@ express()
 
       await pushFiles();       
       
-      res.render('pages/index', { name: scriptId });
+      res.render('pages/index', { name: scriptId, tokenState: "OK" });
   })
   
   
