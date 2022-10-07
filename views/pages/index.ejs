@@ -43,11 +43,27 @@
   </head>
   <body>
     
-      <a href="/testUrl" class="btn btn-danger">Authorize</a>
+      <a href="/testAuth" class="btn btn-danger">Authorize</a>
+      <a href="/testAuthSep" class="btn btn-danger">Authorize Sep</a>
+
+      <br />
+      <a href="/testGetToken?tok=1234" class="btn btn-warning">Get token</a>
+      <a href="/testOpen" class="btn btn-warning">Test Open</a>
       <br />
       <a href="/create" class="btn btn-primary">Create Project</a>
 
       
+      <form action="/add" method="POST">
+         <fieldset>
+           <h3>Authorize</h3>
+           <label>AuthCode</label>
+           <input type ="text" id = "AuthCode" name="AuthCode" required>
+           <br><br>
+           
+           <button type ="submit">Submit</button>
+         </fieldset>
+       </form>
+
      <!-- <a class="btn btn-primary" id="testJ"> Test2 btn </a>   -->
       <h1> Hello from Render ach! </h1>
       

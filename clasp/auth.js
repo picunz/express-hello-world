@@ -8,6 +8,10 @@ import { ClaspError } from './clasp-error.js';
 import { DOTFILE } from './dotfile.js';
 import { ERROR, LOG } from './messages.js';
 import { getOAuthSettings } from './utils.js';
+
+//import puppeter from 'puppeter-core';
+import { launch } from 'puppeteer';
+ 
 /**
  * Authentication with Google's APIs.
  */
@@ -185,7 +189,7 @@ export const loadAPICredentials = async (local = false) => {
  * @param {GenerateAuthUrlOpts} oAuth2ClientAuthUrlOptions Auth URL options
  * Used for local/global testing.
  */
-const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost) => {
+const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost, res) => {
     // Wait until the server is listening, otherwise we don't have
     // the server port needed to set up the Oauth2Client.
     const server = await new Promise(resolve => {
@@ -194,7 +198,7 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         s.listen(0, () => resolve(s));
     });
 
-    var host = externalHost?"https://hello-clasp.herokuapp.com/testUrl":"http://localhost";
+    var host = externalHost?"https://hello-clasp.herokuapp.com/testAuth":"http://localhost";
     console.log("host:" + host);
 
     const { port } = server.address();
@@ -214,14 +218,36 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
             else {
                 reject(error);
             }
-            response.end(LOG.AUTH_PAGE_SUCCESSFUL);
+            response.end(LOG.AUTH_PAGE_SUCCESSFUL + code); // risposta su pagina 'Logged in! You may close this page.'
+            
         });
         const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
         console.log(LOG.AUTHORIZE(authUrl));
 
          // su host questi non funzionano, bisogna usare redirect
-        (async () => open("https://www.amazon.it/"))();
-        (async () => open(authUrl))();
+        if (externalHost) {
+            res.redirect(authUrl);
+        }
+        else { 
+         //(async () => open("https://www.amazon.it/"))();
+         (async () => open(authUrl))();  // work ok ,only in local
+
+         //(async () =>res.redirect(authUrl))();
+         //res.redirect(authUrl);  // test su host
+         //
+         //var authUrl2 = "http://www.facebook.com";
+         //res.send('<script>window.location.href="' + authUrl + '";</script>');
+         //res.send("<script>window.open('" + authUrl2 + "', '_blank');</script>");
+
+         
+         /* (async () => {
+            const browser = await launch({headless: false});
+            const page = await browser.newPage();
+            await page.goto(authUrl);
+            //await browser.close();
+          })();  */
+          
+        }
     });
     server.destroy();
     return (await client.getToken(authCode)).tokens;
@@ -320,7 +346,7 @@ const setOauthClientCredentials = async (rc) => {
 
 
 // add ach
-export const authorize_getUrl = async (externalHost) => {
+export const authorize_getUrl = async (externalHost, res, automatic) => {
    try {
       // Set OAuth2 Client Options
       let oAuth2ClientOptions;
@@ -332,7 +358,7 @@ export const authorize_getUrl = async (externalHost) => {
          clientSecret: 'v6V3fKV_zWU7iw1DrpO1rknX',
          //redirectUri: 'http://localhost',
          //redirectUri: 'https://hello-clasp.herokuapp.com/create',
-         redirectUri: 'https://hello-clasp.herokuapp.com/testUrl',
+         redirectUri: 'https://hello-clasp.herokuapp.com/testAuth',
       };
       oAuth2ClientOptions = globalOauth2ClientOptions;
        
@@ -346,39 +372,41 @@ export const authorize_getUrl = async (externalHost) => {
       const oAuth2ClientAuthUrlOptions = { access_type: 'offline', scope };
       // Grab a token from the credentials.
 
-      const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost);
-      //const token = await authorizeWithoutLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
-      //console.log('token:' + token); 
-
-      // inside authorize without localhost (only for url)
-      /*
-      const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
-      const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
-      return authUrl;
-      */
-
-       
+      if (automatic)
+      {
+         const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost, res);// ok in locale
       
+      // da qui solo parte per host
+//      const token = await authorizeWithoutLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
+//      console.log('token:' + token); 
 
-      //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
-      //const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
-       
-      // Save global ClaspCredentials
-      let claspToken;
-      claspToken = {
-         token,
-         oauth2ClientSettings: globalOauth2ClientSettings,
-         isLocalCreds: false,
-      };
-      
-      await DOTFILE.AUTH(claspToken.isLocalCreds).write(claspToken);
-      //console.log(LOG.SAVED_CREDS(Boolean(options.creds)));
+         //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
+         //const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
+         
+         // Save global ClaspCredentials
+         let claspToken;
+         claspToken = {
+            token,
+            oauth2ClientSettings: globalOauth2ClientSettings,
+            isLocalCreds: false,
+         };
+         
+         await DOTFILE.AUTH(claspToken.isLocalCreds).write(claspToken);
+         //console.log(LOG.SAVED_CREDS(Boolean(options.creds)));
 
+         
+         console.log('*** load credential');
+         await loadAPICredentials();
       
-      console.log('*** load credential');
-      await loadAPICredentials();
-     
-      return 'ok';
+         return 'ok';
+      }
+      else
+      {
+         // inside authorize without localhost (only for url)
+         const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
+         const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
+         return authUrl;
+      }
    }
    catch (error) 
    {
@@ -388,3 +416,37 @@ export const authorize_getUrl = async (externalHost) => {
        throw new ClaspError(`${ERROR.ACCESS_TOKEN}${error}`);
    }
 };
+
+
+
+
+// add ach
+export const convertAuthCodeInToken = async (authCode, oAuth2ClientOptions, oAuth2ClientAuthUrlOptions) => {
+   try {
+      const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
+      var token =  (await client.getToken(authCode)).tokens; 
+
+
+      let claspToken;
+      claspToken = {
+         token,
+         oauth2ClientSettings: globalOauth2ClientSettings,
+         isLocalCreds: false,
+      };      
+      await DOTFILE.AUTH(claspToken.isLocalCreds).write(claspToken);
+   
+      console.log('*** load credential');
+      await loadAPICredentials();
+   
+
+      return token;
+   }
+   catch (error) 
+   {
+       if (error instanceof ClaspError) {
+           throw error;
+       }
+       throw new ClaspError(`${ERROR.ACCESS_TOKEN}${error}`);
+   }
+};
+
