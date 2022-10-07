@@ -185,7 +185,7 @@ export const loadAPICredentials = async (local = false) => {
  * @param {GenerateAuthUrlOpts} oAuth2ClientAuthUrlOptions Auth URL options
  * Used for local/global testing.
  */
-const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOptions) => {
+const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost) => {
     // Wait until the server is listening, otherwise we don't have
     // the server port needed to set up the Oauth2Client.
     const server = await new Promise(resolve => {
@@ -193,13 +193,19 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         enableDestroy(s);
         s.listen(0, () => resolve(s));
     });
+
+    var host = externalHost?"https://hello-clasp.herokuapp.com/":"http://localhost";
+    console.log("host:" + host);
+
     const { port } = server.address();
-    const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: `http://localhost:${port}` });
+    //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: `http://localhost:${port}` });
+    const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: `${host}:${port}` });
     // TODO Add spinner
     const authCode = await new Promise((resolve, reject) => {
         server.on('request', (request, response) => {
             var _a;
-            const urlParts = new URL((_a = request.url) !== null && _a !== void 0 ? _a : '', 'http://localhost').searchParams;
+            //const urlParts = new URL((_a = request.url) !== null && _a !== void 0 ? _a : '', 'http://localhost').searchParams;
+            const urlParts = new URL((_a = request.url) !== null && _a !== void 0 ? _a : '', host).searchParams;
             const code = urlParts.get('code');
             const error = urlParts.get('error');
             if (code) {
@@ -213,7 +219,7 @@ const authorizeWithLocalhost = async (oAuth2ClientOptions, oAuth2ClientAuthUrlOp
         const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
         console.log(LOG.AUTHORIZE(authUrl));
 
-         
+         // su host questi non funzionano, bisogna usare redirect
         (async () => open("https://www.amazon.it/"))();
         (async () => open(authUrl))();
     });
@@ -314,7 +320,7 @@ const setOauthClientCredentials = async (rc) => {
 
 
 // add ach
-export const authorize_getUrl = async () => {
+export const authorize_getUrl = async (externalHost) => {
    try {
       // Set OAuth2 Client Options
       let oAuth2ClientOptions;
@@ -340,13 +346,18 @@ export const authorize_getUrl = async () => {
       const oAuth2ClientAuthUrlOptions = { access_type: 'offline', scope };
       // Grab a token from the credentials.
 
-      //const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
+      const token = await authorizeWithLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions, externalHost);
       //const token = await authorizeWithoutLocalhost(oAuth2ClientOptions, oAuth2ClientAuthUrlOptions);
       //console.log('token:' + token); 
 
+      // inside authorize without localhost (only for url)
+      /*
       const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });
       const authUrl = client.generateAuthUrl(oAuth2ClientAuthUrlOptions);
       return authUrl;
+      */
+
+       
       
 
       //const client = new OAuth2Client({ ...oAuth2ClientOptions, redirectUri: REDIRECT_URI_OOB });

@@ -32,17 +32,20 @@ express()
 
   .get('/testUrl', async (req, res) => {
       
-      const useLocalhost = false;  
+      //const useLocalhost = false;  
       //const authUrl = authorize_getUrl({ scopes: defaultScopes, useLocalhost });
       
-      const authUrl = await authorize_getUrl();
+      const externalHost = true;
+      console.log('process.env:' + process.env.port);
+
+      const authUrl = await authorize_getUrl(externalHost);
       console.log('***' + authUrl);
       
-      //res.render('pages/index', { name: authUrl });
+      res.render('pages/index', { name: authUrl }); // funziona in locale
 
-      res.redirect(authUrl);
+      //res.redirect(authUrl);  // test su host
       
-      //res.redirect("http://www.facebook.com")
+      //res.redirect("http://www.facebook.com") // test
    })
 
   .get('/create', async (req, res) => { 
