@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 
 //const app = express();
 
-const port = process.env.PORT || 5002
+const port = process.env.PORT || 5004
 
 var scriptId;
  
@@ -36,14 +36,12 @@ express()
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({extended: true}))
   .use(express.static("public"))
-
   .set('view engine', 'ejs')
-  .get('/', (req, res) => { res.render('pages/index', { name: "-", tokenState: "-" })})
+
+  .get('/', (req, res) => { res.render('pages/index', { name: "-", tokenState: "-", momentprj: "-" })})
 
   .get('/testAuth', async (req, res) => {
-      
-      //res.send('http://www.facebook.com');
-
+   
       const externalHost = false;
       console.log('process.env:' + process.env.port);
 
@@ -51,11 +49,7 @@ express()
       const authUrl = await authorize_getUrl(externalHost, res, automatic);
       console.log('***' + authUrl);
       
-      res.render('pages/index', { name: "-",  tokenState: "OK"}); // funziona in locale
-
-      //res.redirect(authUrl);  // test su host
-      
-      //res.redirect("http://www.facebook.com") // test
+      res.render('pages/index', { name: "-",  tokenState: "OK", momentprj: "-"}); // funziona in locale
    })
 
    .get('/testAuthSep', async (req, res) => {
@@ -63,6 +57,8 @@ express()
       const externalHost = false;
       console.log('process.env:' + process.env.port);
 
+      
+      // no localhost
       const automatic = false;   
       const authUrl = await authorize_getUrl(externalHost, res, automatic);
       console.log('***' + authUrl);
@@ -82,16 +78,18 @@ express()
       //res.redirect(authUrl);
    })
 
+   /*
   .get('/create', async (req, res) => { 
   
       console.log('clicked');
-              
-      scriptId = await createGoogleProject("test_From_Node");
+      
+      scriptId = await createGoogleProject("fromget");
 
       console.log(scriptId);
       
       res.render('pages/index', { name: scriptId, tokenState: "OK" });
   })
+  */
 
   .post('/createPrj', async(req,res) => {
       var prjName = req.body.ProjectName;
@@ -99,7 +97,7 @@ express()
 
       console.log(scriptId);
       
-      res.render('pages/index', { name: scriptId, tokenState: "OK" });
+      res.render('pages/index', { name: scriptId, tokenState: "OK", momentprj: "no"});
   })
   
   .get('/testGetToken', async (req, res) => { 
@@ -122,7 +120,7 @@ express()
       
       var token = convertAuthCodeInToken(authCode, globalOauth2ClientOptions, oAuth2ClientAuthUrlOptions);
       console.log("token:" + token);
-      res.render('pages/index', { name: "-", tokenState: "OK" });
+      res.render('pages/index', { name: "-", tokenState: "OK", momentprj: "-" });
       
    })
 
